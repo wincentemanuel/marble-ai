@@ -1,0 +1,278 @@
+(e)=>{
+    scene.my.recTick(pos(0), pos(1), vel(1), scene.my.kPvy, scene.my.kAir, scene.my.kLastK, scene.my.kLastGX, scene.my.kRefK, scene.my.kRefY);
+    scene.my.kPvy = vel(1);
+    scene.my.kAir = scene.my.oAir;
+    scene.my.kLastK = scene.my.oLastK;
+    scene.my.kLastGX = scene.my.oLastGX;
+    scene.my.kRefK = scene.my.oRefK;
+    scene.my.kRefY = scene.my.oRefY;
+    scene.my.aiV4Init != true ? {
+        scene.my.aiV4Init = true;
+        scene.my.seekerPos = pos;
+        scene.my.targetPos = pos;
+        scene.my.targetVel = [0, 0];
+        scene.my.d0 = [9999, 9999];
+        scene.my.d1 = [9999, 9999];
+        scene.my.d2 = [9999, 9999];
+        scene.my.d3 = [9999, 9999];
+        scene.my.bestScore = 99999;
+        scene.my.hasTarget = false;
+        scene.my.floorRefY = pos(1);
+        scene.my.lastFloorY = pos(1);
+        scene.my.airTicks = 0;
+        scene.my.blockedRight = false;
+        scene.my.blockedLeft = false;
+        scene.my.scanDir = 1.0;
+        scene.my.progressTimer = 0;
+        scene.my.progressStartX = pos(0);
+        scene.my.holeDropTimer = 0;
+        scene.my.suspectHoleX = pos(0);
+        scene.my.hasSuspectHole = false;
+        scene.my.alignTimer = 0
+    } : {};
+    scene.my.seekerPos = pos;
+    scene.my.airTicks = scene.my.kAir;
+    scene.my.kAir == 0 ? {
+        scene.my.lastFloorY = pos(1)
+    } : {};
+    scene.my.planStep(pos(0), pos(1), scene.my.targetPos(0), scene.my.targetPos(1));
+    _chaseSpeed := 4.2;
+    _scanSpeed := 2.1;
+    _creepSpeed := 0.85;
+    _r := (radius > 0.05) ? radius : 0.25;
+    _dyFloor := pos(1) - scene.my.floorRefY;
+    (_dyFloor > 1.0 || _dyFloor < -1.0) ? {
+        scene.my.floorRefY = pos(1);
+        scene.my.lastFloorY = pos(1);
+        scene.my.blockedRight = false;
+        scene.my.blockedLeft = false;
+        scene.my.hasSuspectHole = false;
+        scene.my.badHoleX = 99999;
+        scene.my.sx0 = 99999;
+        scene.my.sx1 = 99999;
+        scene.my.sx2 = 99999;
+        scene.my.stuckN = 0;
+        scene.my.settle = 0;
+        scene.my.alignTimer = 0;
+        scene.my.progressTimer = 0;
+        scene.my.progressStartX = pos(0)
+    } : {};
+    _inFreefall := (scene.my.airTicks >= 4 && vel(1) < -0.4 && pos(1) < (scene.my.lastFloorY - 0.12));
+    (_inFreefall && scene.my.holeDropTimer <= 0) ? {
+        scene.my.holeDropTimer = 18
+    } : {};
+    _desiredVx := 0.0;
+    _traction := 0.16;
+    scene.my.holeDropTimer > 0 ? {
+        scene.my.holeDropTimer = scene.my.holeDropTimer - 1;
+        color = [0.1, 0.9, 1.0, 1];
+        _desiredVx = vel(0) * 0.1;
+        _traction = 0.35
+    } : {
+        scene.my.hasTarget ? {
+            _tdx := scene.my.targetPos(0) - pos(0);
+            _tdy := scene.my.targetPos(1) - pos(1);
+            _sameFloorBlocked := ((_tdx > 0.3 && scene.my.blockedRight) || (_tdx < -0.3 && scene.my.blockedLeft));
+            scene.my.planIgnore > 0 ? {
+                scene.my.planIgnore = scene.my.planIgnore - 1
+            } : {};
+            _kc0 := pos(0) / scene.my.cs + 500;
+            _kc := _kc0 - _kc0 % 1;
+            _pc := (scene.my.planA - scene.my.planA % 1000) / 1000;
+            _vertical := (scene.my.planType == 0 && _kc == _pc);
+            _planOk := ((scene.my.planType == 0 || scene.my.planType == 1 || scene.my.planType == 4) && scene.my.planIgnore <= 0 &&  ! _vertical &&  ! (scene.my.planType == 1 && scene.my.gRow > scene.my.kRow));
+            _needHole := (_tdy < -0.9 || _tdy > 0.9 || _sameFloorBlocked || _planOk);
+            scene.my.curHoleX = 99999;
+            scene.my.atLift = false;
+            _needHole ? {
+                _holeX := 0.0;
+                _foundHole := false;
+                _isNarrowHole := false;
+                _dy3 := scene.my.d3(1) - pos(1);
+                _bad3 := ((scene.my.d3(0) - scene.my.badHoleX) < 0.8 && (scene.my.d3(0) - scene.my.badHoleX) > -0.8);
+                (_dy3 > -0.8 && _dy3 < 1.0 &&  ! _bad3 &&  ! ((scene.my.d3(0) > pos(0) && scene.my.blockedRight) || (scene.my.d3(0) < pos(0) && scene.my.blockedLeft))) ? {
+                    _holeX = scene.my.d3(0);
+                    _foundHole = true
+                } : {};
+                _dy2 := scene.my.d2(1) - pos(1);
+                _bad2 := ((scene.my.d2(0) - scene.my.badHoleX) < 0.8 && (scene.my.d2(0) - scene.my.badHoleX) > -0.8);
+                (_dy2 > -0.8 && _dy2 < 1.0 &&  ! _bad2 &&  ! ((scene.my.d2(0) > pos(0) && scene.my.blockedRight) || (scene.my.d2(0) < pos(0) && scene.my.blockedLeft))) ? {
+                    _holeX = scene.my.d2(0);
+                    _foundHole = true
+                } : {};
+                _dy1 := scene.my.d1(1) - pos(1);
+                _bad1 := ((scene.my.d1(0) - scene.my.badHoleX) < 0.8 && (scene.my.d1(0) - scene.my.badHoleX) > -0.8);
+                (_dy1 > -0.8 && _dy1 < 1.0 &&  ! _bad1 &&  ! ((scene.my.d1(0) > pos(0) && scene.my.blockedRight) || (scene.my.d1(0) < pos(0) && scene.my.blockedLeft))) ? {
+                    _holeX = scene.my.d1(0);
+                    _foundHole = true
+                } : {};
+                _dy0 := scene.my.d0(1) - pos(1);
+                _bad0 := ((scene.my.d0(0) - scene.my.badHoleX) < 0.8 && (scene.my.d0(0) - scene.my.badHoleX) > -0.8);
+                (_dy0 > -0.8 && _dy0 < 1.0 &&  ! _bad0 &&  ! ((scene.my.d0(0) > pos(0) && scene.my.blockedRight) || (scene.my.d0(0) < pos(0) && scene.my.blockedLeft))) ? {
+                    _holeX = scene.my.d0(0);
+                    _foundHole = true
+                } : {};
+                ( ! _foundHole && scene.my.hasSuspectHole) ? {
+                    _holeX = scene.my.suspectHoleX;
+                    _foundHole = true;
+                    _isNarrowHole = true
+                } : {};
+                _planOk ? {
+                    _holeX = (scene.my.planType == 1 || scene.my.planType == 4) ? scene.my.planA : ((scene.my.planA - scene.my.planA % 1000) / 1000 - 500 + 0.5) * scene.my.cs;
+                    _foundHole = true;
+                    _isNarrowHole = false
+                } : {};
+                _zone := ((_holeX - scene.my.sx0 < 2.5 && _holeX - scene.my.sx0 > -2.5) || (_holeX - scene.my.sx1 < 2.5 && _holeX - scene.my.sx1 > -2.5) || (_holeX - scene.my.sx2 < 2.5 && _holeX - scene.my.sx2 > -2.5));
+                (_foundHole && _zone &&  ! (_planOk && scene.my.planType == 4)) ? {
+                    _foundHole = false
+                } : {};
+                _foundHole ? {
+                    color = [1.0, 0.45, 0.0, 1];
+                    scene.my.curHoleX = _holeX;
+                    scene.my.alignTimer = scene.my.alignTimer + 1;
+                    scene.my.alignTimer > 300 ? {
+                        scene.my.logEv("aligntimeout");
+                        scene.my.badHoleX = _holeX;
+                        scene.my.hasSuspectHole = false;
+                        scene.my.planIgnore = 90;
+                        scene.my.alignTimer = 0
+                    } : {};
+                    _hx := _holeX - pos(0);
+                    _absHx := (_hx < 0) ?  - _hx : _hx;
+                    scene.my.atLift = (scene.my.planType == 4 && _planOk && _absHx < 2.5);
+                    scene.my.atLift ? {
+                        scene.my.alignTimer = 0
+                    } : {};
+                    _approachMax := _isNarrowHole ? _creepSpeed : (((scene.my.planType == 0 || scene.my.planType == 4) && _planOk) ? _chaseSpeed : _scanSpeed);
+                    _desiredVx = _hx * 2.5;
+                    _desiredVx = (_desiredVx > _approachMax) ? _approachMax : ((_desiredVx <  - _approachMax) ?  - _approachMax : _desiredVx);
+                    (scene.my.planType == 4 && _planOk) ? {
+                        _absHx > 3.0 ? {
+                            scene.my.liftDir = (_hx > 0) ? 1.0 : -1.0
+                        } : {
+                            scene.my.liftDir == 0 ? {
+                                scene.my.liftDir = (_hx > 0) ? 1.0 : -1.0
+                            } : {};
+                            ((_hx * scene.my.liftDir) < -4.0) ? {
+                                scene.my.liftDir =  - scene.my.liftDir
+                            } : {};
+                            _desiredVx = scene.my.liftDir * 1.6;
+                            _traction = 0.25
+                        }
+                    } : {}
+                } : {
+                    color = [0.75, 0.15, 0.95, 1];
+                    scene.my.alignTimer = 0;
+                    (scene.my.blockedRight &&  ! scene.my.blockedLeft) ? {
+                        scene.my.scanDir = -1.0
+                    } : {};
+                    (scene.my.blockedLeft &&  ! scene.my.blockedRight) ? {
+                        scene.my.scanDir = 1.0
+                    } : {};
+                    _desiredVx = scene.my.scanDir * _scanSpeed
+                }
+            } : {
+                color = [0.95, 0.05, 0.05, 1];
+                scene.my.alignTimer = 0;
+                _leadX := scene.my.targetPos(0) + scene.my.targetVel(0) * 0.25;
+                _gx := _leadX - pos(0);
+                _desiredVx = _gx * 4.5;
+                _desiredVx = (_desiredVx > _chaseSpeed) ? _chaseSpeed : ((_desiredVx <  - _chaseSpeed) ?  - _chaseSpeed : _desiredVx)
+            };
+            scene.my.lwTimer = scene.my.lwTimer + 1;
+            scene.my.lwTimer == 1 ? {
+                scene.my.lwX = pos(0);
+                scene.my.lwY = pos(1)
+            } : {};
+            scene.my.lwTimer >= 150 ? {
+                _lx := pos(0) - scene.my.lwX;
+                _ly := pos(1) - scene.my.lwY;
+                _lxA := (_lx < 0) ?  - _lx : _lx;
+                _lyA := (_ly < 0) ?  - _ly : _ly;
+                (_lxA < 5.0 && _lyA < 2.0 && scene.my.backoff <= 0 && scene.my.settle <= 0 &&  ! scene.my.atLift) ? {
+                    (scene.my.curHoleX < 99000) ? {
+                        scene.my.badHoleX = scene.my.curHoleX
+                    } : {};
+                    scene.my.settle = 240(scene.my.logEv)("trapped")
+                } : {};
+                scene.my.lwTimer = 0
+            } : {};
+            scene.my.progressTimer = scene.my.progressTimer + 1;
+            scene.my.progressTimer >= 20 ? {
+                _movedX := pos(0) - scene.my.progressStartX;
+                _stuckR := (_desiredVx > 0.7 && _movedX < 0.15 && scene.my.backoff <= 0 &&  ! scene.my.atLift);
+                _stuckL := (_desiredVx < -0.7 && _movedX > -0.15 && scene.my.backoff <= 0 &&  ! scene.my.atLift);
+                (_stuckR || _stuckL) ? {
+                    scene.my.logEv("stuck");
+                    scene.my.alignTimer = 0;
+                    _planOk ? {
+                        scene.my.planIgnore = 90
+                    } : {};
+                    (scene.my.curHoleX < 99000) ? {
+                        scene.my.badHoleX = scene.my.curHoleX
+                    } : {};
+                    _sx := (scene.my.curHoleX < 99000) ? scene.my.curHoleX : pos(0);
+                    scene.my.sxI = (scene.my.sxI + 1) % 3;
+                    scene.my.sxI == 0 ? {
+                        scene.my.sx0 = _sx
+                    } : {
+                        scene.my.sxI == 1 ? {
+                            scene.my.sx1 = _sx
+                        } : {
+                            scene.my.sx2 = _sx
+                        }
+                    };
+                    scene.my.stuckN = (scene.my.stuckN < 4) ? (scene.my.stuckN + 1) : 4;
+                    scene.my.backoff = 30 * scene.my.stuckN;
+                    _stuckR ? {
+                        scene.my.blockedRight = true;
+                        scene.my.blockedLeft = false;
+                        scene.my.scanDir = -1.0;
+                        scene.my.backDir = -1.0
+                    } : {
+                        scene.my.blockedLeft = true;
+                        scene.my.blockedRight = false;
+                        scene.my.scanDir = 1.0;
+                        scene.my.backDir = 1.0
+                    }
+                } : {};
+                (_movedX > 0.5 || _movedX < -0.5) ? {
+                    scene.my.stuckN = 0
+                } : {};
+                scene.my.progressTimer = 0;
+                scene.my.progressStartX = pos(0)
+            } : {}
+        } : {
+            color = [0.0, 0.75, 0.75, 1];
+            _desiredVx = scene.my.scanDir * (_scanSpeed * 0.8)
+        }
+    };
+    _kRowNow := scene.my.key(pos(0), pos(1)) % 1000;
+    scene.my.sfStep(pos(0), _kRowNow);
+    scene.my.sfStep(pos(0), _kRowNow);
+    scene.my.settle > 0 ? {
+        scene.my.settle = scene.my.settle - 1;
+        color = [1.0, 1.0, 1.0, 1];
+        _sf := scene.my.sfX - pos(0);
+        scene.my.sfX < 9000 ? {
+            _desiredVx = (_sf > 0) ? 0.5 : -0.5;
+            _traction = 0.3
+        } : {
+            _desiredVx = 0.0;
+            _traction = 0.35
+        }
+    } : {};
+    scene.my.backoff > 0 ? {
+        scene.my.backoff = scene.my.backoff - 1;
+        color = [1.0, 0.4, 0.7, 1];
+        _desiredVx = scene.my.backDir * _scanSpeed
+    } : {};
+    scene.my.tk = scene.my.tk + 1;
+    scene.my.tk % 5 == 0 ? {
+        scene.my.dump = "x=" + pos(0) + " y=" + pos(1) + " kRow=" + scene.my.kRow + " gRow=" + scene.my.gRow + " plan=" + scene.my.planType + "/" + scene.my.planA + " ign=" + scene.my.planIgnore + " bk=" + scene.my.backoff + " set=" + scene.my.settle + " stk=" + scene.my.stuckN + " bl=" + (scene.my.blockedLeft ? 1 : 0) + " br=" + (scene.my.blockedRight ? 1 : 0) + " lift=" + (scene.my.atLift ? 1 : 0) + " vx=" + _desiredVx + " nW=" + scene.my.nWalk + " nF=" + scene.my.nFall
+    } : {};
+    angvel =  - _desiredVx / _r;
+    vel = [vel(0) + (_desiredVx - vel(0)) * _traction, vel(1)];
+    scene.my.bestScore = 99999;
+    scene.my.hasTarget = false
+}

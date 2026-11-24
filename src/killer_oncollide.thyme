@@ -1,0 +1,25 @@
+(e)=>{
+    e.other.materialName == "a" ? {
+        e.other.pos = scene.my.tp3;
+        e.other.vel = [0, 0];
+        e.other.postStep = (e)=>{};
+        e.other.restitution = 0;
+        scene.my.blockedRight = false;
+        scene.my.blockedLeft = false;
+        scene.my.hasSuspectHole = false;
+        scene.my.alignTimer = 0
+    } : {
+        (scene.my.airTicks >= 2 && pos(1) < (scene.my.lastFloorY - 0.04) && pos(1) > (scene.my.lastFloorY - 0.45)) ? {
+            scene.my.suspectHoleX = pos(0);
+            scene.my.hasSuspectHole = true
+        } : {};
+        (e.normal(0) > 0.65 && scene.my.scanDir > 0) ? {
+            scene.my.blockedRight = true;
+            scene.my.scanDir = -1.0
+        } : {};
+        (e.normal(0) < -0.65 && scene.my.scanDir < 0) ? {
+            scene.my.blockedLeft = true;
+            scene.my.scanDir = 1.0
+        } : {}
+    }
+}

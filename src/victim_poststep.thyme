@@ -1,0 +1,41 @@
+(e)=>{
+    scene.my.recTick(pos(0), pos(1), vel(1), scene.my.vPvy, scene.my.vAir, scene.my.vLastK, scene.my.vLastGX, scene.my.vRefK, scene.my.vRefY);
+    scene.my.vPvy = vel(1);
+    scene.my.vAir = scene.my.oAir;
+    scene.my.vLastK = scene.my.oLastK;
+    scene.my.vLastGX = scene.my.oLastGX;
+    scene.my.vRefK = scene.my.oRefK;
+    scene.my.vRefY = scene.my.oRefY;
+    this._mr3Init != true ? {
+        this._mr3Init = true;
+        this._prevVy = 0.0;
+        this._d0 = [9999, 9999];
+        this._d1 = [9999, 9999];
+        this._d2 = [9999, 9999];
+        this._d3 = [9999, 9999]
+    } : {};
+    _tippedDown := (vel(1) < -2.4 && this._prevVy >= -2.4);
+    this._prevVy = vel(1);
+    _tippedDown ? {
+        this._d3 = this._d2;
+        this._d2 = this._d1;
+        this._d1 = this._d0;
+        this._d0 = pos
+    } : {};
+    _dx := pos(0) - scene.my.seekerPos(0);
+    _dy := pos(1) - scene.my.seekerPos(1);
+    _dist := math.sqrt(_dx * _dx + _dy * _dy);
+    _upPenalty := (_dy > 1.0) ? (_dy * 15.0) : 0.0;
+    _wallPenalty := ((_dy > -0.9 && _dy < 1.0) && ((_dx > 0.5 && scene.my.blockedRight) || (_dx < -0.5 && scene.my.blockedLeft))) ? 18.0 : 0.0;
+    _score := _dist + _upPenalty + _wallPenalty;
+    _score < scene.my.bestScore ? {
+        scene.my.bestScore = _score;
+        scene.my.targetPos = pos;
+        scene.my.targetVel = vel;
+        scene.my.d0 = this._d0;
+        scene.my.d1 = this._d1;
+        scene.my.d2 = this._d2;
+        scene.my.d3 = this._d3;
+        scene.my.hasTarget = true
+    } : {}
+}

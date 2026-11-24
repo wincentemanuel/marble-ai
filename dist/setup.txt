@@ -1,0 +1,229 @@
+scene.my.cs = 4.0; scene.my.cap = 120; scene.my.found = false; scene.my.fi = 0;
+scene.my.nWalk = 0; scene.my.wA = []; scene.my.wB = [];
+scene.my.nFall = 0; scene.my.fA = []; scene.my.fB = []; scene.my.fX = [];
+scene.my.kAir = 0; scene.my.kLastK = -1; scene.my.kLastGX = 0; scene.my.kRefK = -1; scene.my.kRefY = 0; scene.my.kPvy = 0;
+scene.my.vAir = 0; scene.my.vLastK = -1; scene.my.vLastGX = 0; scene.my.vRefK = -1; scene.my.vRefY = 0; scene.my.vPvy = 0;
+scene.my.oAir = 0; scene.my.oLastK = -1; scene.my.oLastGX = 0; scene.my.oRefK = -1; scene.my.oRefY = 0;
+scene.my.backoff = 0; scene.my.backDir = 1.0; scene.my.curHoleX = 99999; scene.my.stuckN = 0; scene.my.planIgnore = 0;
+scene.my.sx0 = 99999; scene.my.sx1 = 99999; scene.my.sx2 = 99999; scene.my.sxI = 0; scene.my.badHoleX = 99999;
+scene.my.lwTimer = 0; scene.my.lwX = 0; scene.my.lwY = 0; scene.my.settle = 0;
+scene.my.sfI = 0; scene.my.sfBestX = 99999; scene.my.sfBestD = 99; scene.my.sfX = 99999;
+scene.my.atLift = false; scene.my.liftDir = 0;
+scene.my.tk = 0; scene.my.dump = ""; scene.my.ev0 = ""; scene.my.ev1 = ""; scene.my.ev2 = "";
+scene.my.aiV4Init = false;
+
+scene.my.logEv = (c)=>{
+    scene.my.ev2 = scene.my.ev1;
+    scene.my.ev1 = scene.my.ev0;
+    scene.my.ev0 = c + " @ " + scene.my.dump
+};
+
+scene.my.key = (px, py)=>{
+    _gx := px / scene.my.cs + 500;
+    _gy := py / scene.my.cs + 500;
+    (_gx - _gx % 1) * 1000 + (_gy - _gy % 1)
+};
+
+scene.my.hasW4 = (a, b, i, lo)=>{
+    i < lo ? {} : {
+        (scene.my.wA(i) == a && scene.my.wB(i) == b) ? { scene.my.found = true } : { scene.my.hasW4(a, b, i - 1, lo) }
+    }
+};
+scene.my.hasW = (a, b, i)=>{
+    _lo := i - 24;
+    scene.my.hasW4(a, b, i, (_lo < 0) ? 0 : _lo)
+};
+
+scene.my.hasF4 = (a, x, i, lo)=>{
+    i < lo ? {} : {
+        (scene.my.fA(i) == a && scene.my.fX(i) - x < 0.8 && scene.my.fX(i) - x > -0.8) ? { scene.my.found = true } : { scene.my.hasF4(a, x, i - 1, lo) }
+    }
+};
+scene.my.hasF = (a, x, i)=>{
+    _lo := i - 24;
+    scene.my.hasF4(a, x, i, (_lo < 0) ? 0 : _lo)
+};
+
+scene.my.recTick = (px, py, vy, pvy, air, lastK, lastGX, refK, refY)=>{
+    _fall := (vy - pvy) < -0.1;
+    scene.my.oAir = _fall ? (air + 1) : 0;
+    scene.my.oLastK = lastK;
+    scene.my.oLastGX = lastGX;
+    scene.my.oRefK = refK;
+    scene.my.oRefY = refY;
+    _fall ? {} : {
+        _k := scene.my.key(px, py);
+        refK == -1 ? { scene.my.oRefK = _k; scene.my.oRefY = py } : {};
+        air >= 4 ? {
+            (lastK != -1 && _k != lastK) ? {
+                scene.my.found = false;
+                scene.my.hasF(lastK, lastGX, scene.my.nFall - 1);
+                (!scene.my.found && scene.my.nFall < scene.my.cap) ? {
+                    scene.my.fA = scene.my.fA ++ [lastK];
+                    scene.my.fB = scene.my.fB ++ [_k];
+                    scene.my.fX = scene.my.fX ++ [lastGX];
+                    scene.my.nFall = scene.my.nFall + 1
+                } : {}
+            } : {};
+            scene.my.oRefK = _k;
+            scene.my.oRefY = py
+        } : {
+            (refK != -1 && (py - refY > 1.0 || refY - py > 1.0)) ? {
+                scene.my.found = false;
+                scene.my.hasW(refK, _k, scene.my.nWalk - 1);
+                (!scene.my.found && scene.my.nWalk < scene.my.cap) ? {
+                    scene.my.wA = scene.my.wA ++ [refK];
+                    scene.my.wB = scene.my.wB ++ [_k];
+                    scene.my.nWalk = scene.my.nWalk + 1
+                } : {};
+                scene.my.oRefK = _k;
+                scene.my.oRefY = py
+            } : {}
+        };
+        scene.my.oLastK = _k;
+        scene.my.oLastGX = px
+    }
+};
+
+scene.my.plState = 0; scene.my.plHold = 0; scene.my.plPass = 0; scene.my.plE = 0;
+scene.my.plAdded = false; scene.my.plFound = false;
+scene.my.pvK = []; scene.my.pvT = []; scene.my.pvA = []; scene.my.nPv = 0;
+scene.my.planType = -1; scene.my.planA = 0; scene.my.kRow = 0; scene.my.gRow = 0;
+scene.my.plBestD = 99; scene.my.plBestT = 2; scene.my.plBestA = 0; scene.my.plLastK = -1;
+
+scene.my.findPv = (k, i)=>{
+    i < 0 ? {} : {
+        scene.my.pvK(i) == k ? { scene.my.found = true; scene.my.fi = i } : { scene.my.findPv(k, i - 1) }
+    }
+};
+
+scene.my.addPv = (k, t, a)=>{
+    scene.my.nPv < 40 ? {
+        scene.my.nPv == 0 ? { scene.my.plBestD = 99; scene.my.plBestT = 2; scene.my.plBestA = 0 } : {};
+        scene.my.pvK = scene.my.pvK ++ [k];
+        scene.my.pvT = scene.my.pvT ++ [t];
+        scene.my.pvA = scene.my.pvA ++ [a];
+        scene.my.nPv = scene.my.nPv + 1;
+        scene.my.plAdded = true;
+        _rd := k % 1000 - scene.my.gRow;
+        _ad := (_rd < 0) ? -_rd : _rd;
+        _ad < scene.my.plBestD ? {
+            scene.my.plBestD = _ad;
+            scene.my.plBestT = t;
+            scene.my.plBestA = a
+        } : {};
+        (k % 1000 == scene.my.gRow) ? {
+            scene.my.plFound = true;
+            scene.my.planType = t;
+            scene.my.planA = a;
+            scene.my.plState = 2
+        } : {}
+    } : {}
+};
+
+scene.my.plEdge = (s, d, et, ex)=>{
+    _et := (et == 1 && d % 1000 > s % 1000) ? 4 : et;
+    scene.my.found = false;
+    scene.my.findPv(d, scene.my.nPv - 1);
+    scene.my.found ? {} : {
+        scene.my.found = false;
+        scene.my.findPv(s, scene.my.nPv - 1);
+        scene.my.found ? {
+            _sh := scene.my.pvT(scene.my.fi);
+            _sa := scene.my.pvA(scene.my.fi);
+            _sh == 2 ? {
+                scene.my.addPv(d, _et, (_et == 0) ? d : ex)
+            } : {
+                scene.my.addPv(d, _sh, _sa)
+            }
+        } : {
+            (scene.my.plPass == 0 && s % 1000 == scene.my.kRow) ? {
+                scene.my.addPv(s, 2, 0)
+            } : {}
+        }
+    }
+};
+
+scene.my.plDone = ()=>{
+    scene.my.plState = 2;
+    scene.my.plFound ? {} : {
+        (scene.my.nPv > 0 && scene.my.plBestT != 2) ? {
+            scene.my.planType = scene.my.plBestT;
+            scene.my.planA = scene.my.plBestA
+        } : {
+            scene.my.planType = -1
+        }
+    }
+};
+
+scene.my.planStep0 = (kx, ky, tx, ty)=>{
+    scene.my.plState == 2 ? {
+        scene.my.plHold = scene.my.plHold + 1;
+        scene.my.plHold > 60 ? { scene.my.plState = 0; scene.my.plHold = 0 } : {}
+    } : {
+        scene.my.plState == 0 ? {
+            scene.my.kRow = scene.my.key(kx, ky) % 1000;
+            scene.my.gRow = scene.my.key(tx, ty) % 1000;
+            scene.my.pvK = []; scene.my.pvT = []; scene.my.pvA = [];
+            scene.my.nPv = 0; scene.my.plPass = 0; scene.my.plE = 0;
+            scene.my.plAdded = false; scene.my.plFound = false;
+            scene.my.kRow == scene.my.gRow ? {
+                scene.my.plFound = true;
+                scene.my.planType = 3;
+                scene.my.plState = 2
+            } : {
+                scene.my.plState = 1
+            }
+        } : {
+            _tot := scene.my.nWalk + scene.my.nFall;
+            _tot == 0 ? { scene.my.plDone() } : {
+                (scene.my.plE < scene.my.nWalk) ? {
+                    scene.my.plEdge(scene.my.wA(scene.my.plE), scene.my.wB(scene.my.plE), 0, 0)
+                } : {
+                    _fe := scene.my.plE - scene.my.nWalk;
+                    scene.my.plEdge(scene.my.fA(_fe), scene.my.fB(_fe), 1, scene.my.fX(_fe))
+                };
+                scene.my.plE = scene.my.plE + 1;
+                scene.my.plE >= _tot ? {
+                    scene.my.plE = 0;
+                    scene.my.plPass = scene.my.plPass + 1;
+                    (scene.my.plState == 1 && (!scene.my.plAdded || scene.my.plPass > 12)) ? { scene.my.plDone() } : {};
+                    scene.my.plAdded = false
+                } : {}
+            }
+        }
+    }
+};
+
+scene.my.planStep = (kx, ky, tx, ty)=>{
+    _k := scene.my.key(kx, ky) % 1000;
+    _k != scene.my.plLastK ? {
+        scene.my.plLastK = _k;
+        scene.my.plState = 0;
+        scene.my.plHold = 0
+    } : {};
+    scene.my.planStep0(kx, ky, tx, ty);
+    scene.my.planStep0(kx, ky, tx, ty);
+    scene.my.planStep0(kx, ky, tx, ty);
+    scene.my.planStep0(kx, ky, tx, ty)
+};
+
+scene.my.sfStep = (px, row)=>{
+    scene.my.nFall == 0 ? {} : {
+        scene.my.sfI >= scene.my.nFall ? {
+            scene.my.sfX = scene.my.sfBestX;
+            scene.my.sfBestX = 99999;
+            scene.my.sfBestD = 99;
+            scene.my.sfI = 0
+        } : {
+            _r := scene.my.fA(scene.my.sfI) % 1000 - row;
+            _dx := scene.my.fX(scene.my.sfI) - px;
+            _adx := (_dx < 0) ? -_dx : _dx;
+            (_r < 2 && _r > -3 && _adx < 8.0 && _adx < scene.my.sfBestD) ? {
+                scene.my.sfBestD = _adx;
+                scene.my.sfBestX = scene.my.fX(scene.my.sfI)
+            } : {};
+            scene.my.sfI = scene.my.sfI + 1
+        }
+    }
+};
