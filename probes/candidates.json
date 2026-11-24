@@ -1,0 +1,163 @@
+[
+  {
+    "id": "floor_mod_pos",
+    "category": "truncation_floor",
+    "token": "x - (x % 1)",
+    "expr": "3.75 - (3.75 % 1)",
+    "description": "Positive float truncation via modulo 1"
+  },
+  {
+    "id": "floor_mod_neg",
+    "category": "truncation_floor",
+    "token": "neg x - (x % 1)",
+    "expr": "(-3.75) - ((-3.75) % 1)",
+    "description": "Negative float truncation behavior via modulo 1"
+  },
+  {
+    "id": "int_cast",
+    "category": "truncation_floor",
+    "token": "int",
+    "expr": "int(3.75)",
+    "description": "Built-in int() cast"
+  },
+  {
+    "id": "math_round",
+    "category": "truncation_floor",
+    "token": "math.round",
+    "expr": "math.round(3.75)",
+    "description": "math.round() function"
+  },
+  {
+    "id": "math_floor_lower",
+    "category": "truncation_floor",
+    "token": "math.floor",
+    "expr": "math.floor(3.75)",
+    "description": "Lowercase math.floor() function"
+  },
+  {
+    "id": "math_ceil_lower",
+    "category": "truncation_floor",
+    "token": "math.ceil",
+    "expr": "math.ceil(3.25)",
+    "description": "Lowercase math.ceil() function"
+  },
+  {
+    "id": "math_abs_lower",
+    "category": "truncation_floor",
+    "token": "math.abs",
+    "expr": "math.abs(-3.75)",
+    "description": "Lowercase math.abs() function"
+  },
+  {
+    "id": "scene_entities",
+    "category": "entity_iteration",
+    "token": "Scene.entities",
+    "expr": "Scene.entities",
+    "description": "Scene.entities collection"
+  },
+  {
+    "id": "sim_entities",
+    "category": "entity_iteration",
+    "token": "Sim.entities",
+    "expr": "Sim.entities",
+    "description": "Sim.entities collection"
+  },
+  {
+    "id": "geom_id",
+    "category": "entity_iteration",
+    "token": "geomID",
+    "expr": "geomID",
+    "description": "Read entity geomID inside postStep"
+  },
+  {
+    "id": "entity_id",
+    "category": "entity_iteration",
+    "token": "entityID",
+    "expr": "entityID",
+    "description": "Read entityID inside postStep"
+  },
+  {
+    "id": "scene_add_laser",
+    "category": "laser_raycast",
+    "token": "Scene.addLaser",
+    "expr": "Scene.addLaser",
+    "description": "Check whether Scene.addLaser exists in script scope"
+  },
+  {
+    "id": "hit_pos",
+    "category": "laser_raycast",
+    "token": "hitPos",
+    "expr": "hitPos",
+    "description": "Check hitPos property availability"
+  },
+  {
+    "id": "length_prop",
+    "category": "laser_raycast",
+    "token": "length",
+    "expr": "length",
+    "description": "Check length property availability"
+  },
+  {
+    "id": "prop_adhesion",
+    "category": "physics_properties",
+    "token": "adhesion",
+    "expr": "adhesion",
+    "description": "Read entity adhesion inside postStep"
+  },
+  {
+    "id": "prop_attraction",
+    "category": "physics_properties",
+    "token": "attraction",
+    "expr": "attraction",
+    "description": "Read entity attraction inside postStep"
+  },
+  {
+    "id": "prop_attraction_type",
+    "category": "physics_properties",
+    "token": "attractionType",
+    "expr": "attractionType",
+    "description": "Read entity attractionType inside postStep"
+  },
+  {
+    "id": "prop_hetero_collide",
+    "category": "physics_properties",
+    "token": "heteroCollide",
+    "expr": "heteroCollide",
+    "description": "Read entity heteroCollide inside postStep"
+  },
+  {
+    "id": "sim_time",
+    "category": "timing_logging",
+    "token": "Sim.time",
+    "expr": "Sim.time",
+    "description": "Sim.time property"
+  },
+  {
+    "id": "sim_tick",
+    "category": "timing_logging",
+    "token": "Sim.tick",
+    "expr": "Sim.tick",
+    "description": "Sim.tick property"
+  },
+  {
+    "id": "fn_print",
+    "category": "timing_logging",
+    "token": "print",
+    "expr": "print(\"thyme_probe_print\")",
+    "description": "Global print() function"
+  },
+  {
+    "id": "fn_system_print",
+    "category": "timing_logging",
+    "token": "System.print",
+    "expr": "System.print(\"thyme_probe_sysprint\")",
+    "description": "System.print() function"
+  },
+  {
+    "id": "fn_console_print",
+    "category": "timing_logging",
+    "token": "Console.print",
+    "expr": "Console.print(\"thyme_probe_conprint\")",
+    "description": "Console.print() function"
+  }
+]

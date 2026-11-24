@@ -4,22 +4,56 @@
         e.other.vel = [0, 0];
         e.other.postStep = (e)=>{};
         e.other.restitution = 0;
+        adhesion = 0.0;
+        friction = 0.8;
+        restitution = 0.12;
+        scene.my.passiveBreakoutTimer = 0;
+        scene.my.passiveStaleTicks = 0;
+        scene.my.passiveLastCells = scene.my.nCells;
+        scene.my.patrolTimer = 0;
+        scene.my.unstickTimer = 0;
+        scene.my.unstickIdleTicks = 0;
+        scene.my.famLoopTimer = 0;
+        scene.my.famLoopAnchorX = pos(0);
+        scene.my.famLoopAnchorY = pos(1);
+        scene.my.famLastCells = scene.my.nCells;
+        scene.my.activeHop = -1;
+        scene.my.lastUsedHop = -1;
+        scene.my.windupPhase = 0;
+        scene.my.windupTriedCell = -1;
         scene.my.blockedRight = false;
         scene.my.blockedLeft = false;
+        scene.my.hitWallR = false;
+        scene.my.hitWallL = false;
         scene.my.hasSuspectHole = false;
         scene.my.alignTimer = 0
     } : {
+        _nx := -e.normal(0);
+        _ny := -e.normal(1);
+        _ny > 0.55 ? {
+            scene.my.kGroundNx = _nx;
+            scene.my.kGroundNy = _ny;
+            scene.my.kGroundContactTick = scene.my.tk
+        } : {};
         (scene.my.airTicks >= 2 && pos(1) < (scene.my.lastFloorY - 0.04) && pos(1) > (scene.my.lastFloorY - 0.45)) ? {
             scene.my.suspectHoleX = pos(0);
             scene.my.hasSuspectHole = true
         } : {};
-        (e.normal(0) > 0.65 && scene.my.scanDir > 0) ? {
-            scene.my.blockedRight = true;
-            scene.my.scanDir = -1.0
+        e.normal(0) > 0.62 ? {
+            scene.my.hitWallR = true;
+            adhesion = 0.0;
+            scene.my.scanDir > 0 ? {
+                scene.my.blockedRight = true;
+                scene.my.scanDir = -1.0
+            } : {}
         } : {};
-        (e.normal(0) < -0.65 && scene.my.scanDir < 0) ? {
-            scene.my.blockedLeft = true;
-            scene.my.scanDir = 1.0
+        e.normal(0) < -0.62 ? {
+            scene.my.hitWallL = true;
+            adhesion = 0.0;
+            scene.my.scanDir < 0 ? {
+                scene.my.blockedLeft = true;
+                scene.my.scanDir = 1.0
+            } : {}
         } : {}
     }
 }

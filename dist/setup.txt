@@ -1,15 +1,45 @@
-scene.my.cs = 4.0; scene.my.cap = 120; scene.my.found = false; scene.my.fi = 0;
-scene.my.nWalk = 0; scene.my.wA = []; scene.my.wB = [];
-scene.my.nFall = 0; scene.my.fA = []; scene.my.fB = []; scene.my.fX = [];
-scene.my.kAir = 0; scene.my.kLastK = -1; scene.my.kLastGX = 0; scene.my.kRefK = -1; scene.my.kRefY = 0; scene.my.kPvy = 0;
-scene.my.vAir = 0; scene.my.vLastK = -1; scene.my.vLastGX = 0; scene.my.vRefK = -1; scene.my.vRefY = 0; scene.my.vPvy = 0;
-scene.my.oAir = 0; scene.my.oLastK = -1; scene.my.oLastGX = 0; scene.my.oRefK = -1; scene.my.oRefY = 0;
+scene.my.cs = 1.25; scene.my.maxCells = 220; scene.my.maxWalk = 320; scene.my.maxFall = 240;
+scene.my.found = false; scene.my.fi = 0; scene.my.oList = []; scene.my.oCount = 0;
+scene.my.nCells = 0; scene.my.cells = []; scene.my.cBlockL = []; scene.my.cBlockR = []; scene.my.cRamp = []; scene.my.cHeat = [];
+scene.my.heatCursor = 0; scene.my.curCellHeat = 0.0; scene.my.prevHeatCell = -1; scene.my.heatDwell = 0;
+scene.my.kHeatCell = -1; scene.my.kHeatIdx = -1;
+scene.my.kPrevGx = -9999; scene.my.kPrevGy = -9999; scene.my.kCachedCost = 99999; scene.my.kCachedHop = -1; scene.my.kCachedBfGen = -1;
+scene.my.nWalk = 0; scene.my.wA = []; scene.my.wB = []; scene.my.wByK = []; scene.my.wFail = []; scene.my.wCool = []; scene.my.wUse = [];
+scene.my.nFall = 0; scene.my.fA = []; scene.my.fB = []; scene.my.fX = []; scene.my.fVx = []; scene.my.fByK = []; scene.my.fFail = []; scene.my.fCool = []; scene.my.fUse = [];
+scene.my.coolCount = 0;
+scene.my.kAir = 0; scene.my.kGnd = 0; scene.my.kPeakAir = 0; scene.my.kLastK = -1; scene.my.kLastGX = 0; scene.my.kLastGVx = 0; scene.my.kRefK = -1; scene.my.kPvy = 0;
+scene.my.vAir = 0; scene.my.vGnd = 0; scene.my.vPeakAir = 0; scene.my.vLastK = -1; scene.my.vLastGX = 0; scene.my.vLastGVx = 0; scene.my.vRefK = -1; scene.my.vPvy = 0;
+scene.my.oAir = 0; scene.my.oGnd = 0; scene.my.oPeakAir = 0; scene.my.oLastK = -1; scene.my.oLastGX = 0; scene.my.oLastGVx = 0; scene.my.oRefK = -1;
+scene.my.kGroundNx = 0.0; scene.my.kGroundNy = 1.0; scene.my.kGroundContactTick = -99;
+scene.my.hitWallR = false; scene.my.hitWallL = false;
+scene.my.vCells = []; scene.my.nVCells = 0;
+scene.my.cCost = []; scene.my.cHop = []; scene.my.nCReady = 0;
+scene.my.bfCost = []; scene.my.bfHop = []; scene.my.bfN = 0;
+scene.my.bfCursor = 0; scene.my.bfPass = 0; scene.my.bfChanged = false; scene.my.bfGen = 0;
+scene.my.bfDirty = true; scene.my.bfNeedsInit = true; scene.my.bfResweep = false; scene.my.prevTargetCell = -1;
+scene.my.edgeAttemptTicks = 0; scene.my.activeHop = -1; scene.my.activeHopSrc = -1; scene.my.activeHopGoal = false; scene.my.lastUsedHop = -1;
+scene.my.ppPrevA = -1; scene.my.ppPrevB = -1; scene.my.ppCount = 0; scene.my.lastDesiredVx = 0.0;
+scene.my.microTimer = 0; scene.my.microStartX = 0.0; scene.my.microBackoff = 0; scene.my.microBackDir = 1.0;
+scene.my.microSurge = 0; scene.my.microSurgeDir = 1.0; scene.my.microCell = -1; scene.my.microStallN = 0;
+scene.my.famLoopTimer = 0; scene.my.famLoopAnchorX = 0.0; scene.my.famLoopAnchorY = 0.0; scene.my.famLastCells = 0;
+scene.my.passiveBreakoutTimer = 0; scene.my.unstickTimer = 0; scene.my.unstickIdleTicks = 0; scene.my.unstickDir = 1.0;
+scene.my.passiveStaleTicks = 0; scene.my.passiveLastCells = 0; scene.my.patrolTimer = 0; scene.my.patrolTargetK = -1; scene.my.patrolTargetX = 0.0; scene.my.patrolScore = -99999.0;
+scene.my.modeLabel = "PASSIVE_EXPLORE";
+scene.my.windupPhase = 0; scene.my.windupTicks = 0; scene.my.windupDir = 1.0;
+scene.my.windupStartX = 0.0; scene.my.windupStartY = 0.0; scene.my.windupEdge = -1; scene.my.windupTriedCell = -1;
+scene.my.hudHop = "NONE"; scene.my.hudMode = "NONE"; scene.my.hudCost = 99999; scene.my.hudUse = 0; scene.my.hudThought = "Exploring new territory -> rolling as natural marble";
 scene.my.backoff = 0; scene.my.backDir = 1.0; scene.my.curHoleX = 99999; scene.my.stuckN = 0; scene.my.planIgnore = 0;
-scene.my.sx0 = 99999; scene.my.sx1 = 99999; scene.my.sx2 = 99999; scene.my.sxI = 0; scene.my.badHoleX = 99999;
-scene.my.lwTimer = 0; scene.my.lwX = 0; scene.my.lwY = 0; scene.my.settle = 0;
-scene.my.sfI = 0; scene.my.sfBestX = 99999; scene.my.sfBestD = 99; scene.my.sfX = 99999;
+scene.my.holeDropTimer = 0; scene.my.suspectHoleX = 0.0; scene.my.hasSuspectHole = false; scene.my.alignTimer = 0;
 scene.my.atLift = false; scene.my.liftDir = 0;
 scene.my.tk = 0; scene.my.dump = ""; scene.my.ev0 = ""; scene.my.ev1 = ""; scene.my.ev2 = "";
+scene.my.kState = "INIT"; scene.my.kCell = -1; scene.my.targetCell = -1; scene.my.hudText = "V0.9 INIT";
+scene.my.hudTick = 6; scene.my.hudVer = 0;
+scene.my.seekerPos = [0, 0]; scene.my.targetPos = [0, 0]; scene.my.targetVel = [0, 0];
+scene.my.d0 = [9999, 9999]; scene.my.d1 = [9999, 9999]; scene.my.d2 = [9999, 9999]; scene.my.d3 = [9999, 9999];
+scene.my.bestScore = 99999; scene.my.hasTarget = false;
+scene.my.floorRefY = 0.0; scene.my.lastFloorY = 0.0; scene.my.airTicks = 0;
+scene.my.blockedRight = false; scene.my.blockedLeft = false; scene.my.scanDir = 1.0;
+scene.my.progressTimer = 0; scene.my.progressStartX = 0.0;
 scene.my.aiV4Init = false;
 
 scene.my.logEv = (c)=>{
@@ -18,212 +48,647 @@ scene.my.logEv = (c)=>{
     scene.my.ev0 = c + " @ " + scene.my.dump
 };
 
+scene.my.flr = (x)=>{
+    _m := x % 1;
+    (x < 0 && _m != 0) ? (x - _m - 1) : (x - _m)
+};
+
 scene.my.key = (px, py)=>{
-    _gx := px / scene.my.cs + 500;
-    _gy := py / scene.my.cs + 500;
-    (_gx - _gx % 1) * 1000 + (_gy - _gy % 1)
+    _gx := scene.my.flr(px / scene.my.cs) + 500;
+    _gy := scene.my.flr(py / scene.my.cs) + 500;
+    _gx * 1000 + _gy
 };
 
-scene.my.hasW4 = (a, b, i, lo)=>{
-    i < lo ? {} : {
-        (scene.my.wA(i) == a && scene.my.wB(i) == b) ? { scene.my.found = true } : { scene.my.hasW4(a, b, i - 1, lo) }
-    }
+scene.my.findCChunk = (k, lo, cnt)=>{
+    for(cnt, (j)=>{
+        _i := lo + j;
+        scene.my.cells(_i) == k ? { scene.my.found = true; scene.my.fi = _i } : {}
+    })
 };
-scene.my.hasW = (a, b, i)=>{
-    _lo := i - 24;
-    scene.my.hasW4(a, b, i, (_lo < 0) ? 0 : _lo)
+scene.my.findCell = (k, n)=>{
+    scene.my.found = false;
+    scene.my.fi = -1;
+    _rem := n % 20;
+    _nc := (n - _rem) / 20;
+    _nc > 0 ? {
+        for(_nc, (c)=>{
+            !scene.my.found ? { scene.my.findCChunk(k, c * 20, 20) } : {}
+        })
+    } : {};
+    (!scene.my.found && _rem > 0) ? {
+        scene.my.findCChunk(k, _nc * 20, _rem)
+    } : {}
 };
 
-scene.my.hasF4 = (a, x, i, lo)=>{
-    i < lo ? {} : {
-        (scene.my.fA(i) == a && scene.my.fX(i) - x < 0.8 && scene.my.fX(i) - x > -0.8) ? { scene.my.found = true } : { scene.my.hasF4(a, x, i - 1, lo) }
-    }
+scene.my.setAtChunk = (lst, lo, cnt, idx, val)=>{
+    for(cnt, (j)=>{
+        _i := lo + j;
+        scene.my.oList = scene.my.oList ++ [(_i == idx) ? val : lst(_i)]
+    })
 };
-scene.my.hasF = (a, x, i)=>{
-    _lo := i - 24;
-    scene.my.hasF4(a, x, i, (_lo < 0) ? 0 : _lo)
+scene.my.setAt = (lst, n, idx, val)=>{
+    scene.my.oList = [];
+    _rem := n % 20;
+    _nc := (n - _rem) / 20;
+    _nc > 0 ? {
+        for(_nc, (c)=>{
+            scene.my.setAtChunk(lst, c * 20, 20, idx, val)
+        })
+    } : {};
+    _rem > 0 ? {
+        scene.my.setAtChunk(lst, _nc * 20, _rem, idx, val)
+    } : {}
 };
 
-scene.my.recTick = (px, py, vy, pvy, air, lastK, lastGX, refK, refY)=>{
-    _fall := (vy - pvy) < -0.1;
-    scene.my.oAir = _fall ? (air + 1) : 0;
-    scene.my.oLastK = lastK;
-    scene.my.oLastGX = lastGX;
-    scene.my.oRefK = refK;
-    scene.my.oRefY = refY;
-    _fall ? {} : {
-        _k := scene.my.key(px, py);
-        refK == -1 ? { scene.my.oRefK = _k; scene.my.oRefY = py } : {};
-        air >= 4 ? {
-            (lastK != -1 && _k != lastK) ? {
-                scene.my.found = false;
-                scene.my.hasF(lastK, lastGX, scene.my.nFall - 1);
-                (!scene.my.found && scene.my.nFall < scene.my.cap) ? {
-                    scene.my.fA = scene.my.fA ++ [lastK];
-                    scene.my.fB = scene.my.fB ++ [_k];
-                    scene.my.fX = scene.my.fX ++ [lastGX];
-                    scene.my.nFall = scene.my.nFall + 1
-                } : {}
-            } : {};
-            scene.my.oRefK = _k;
-            scene.my.oRefY = py
+scene.my.heatStep = (kCell, isGnd)=>{
+    _n := scene.my.nCells;
+    _n <= 0 ? {
+        scene.my.curCellHeat = 0.0
+    } : {
+        _kIdx := -1;
+        (kCell == scene.my.kHeatCell && scene.my.kHeatIdx >= 0 && scene.my.kHeatIdx < _n) ? {
+            _kIdx = scene.my.kHeatIdx
         } : {
-            (refK != -1 && (py - refY > 1.0 || refY - py > 1.0)) ? {
-                scene.my.found = false;
-                scene.my.hasW(refK, _k, scene.my.nWalk - 1);
-                (!scene.my.found && scene.my.nWalk < scene.my.cap) ? {
-                    scene.my.wA = scene.my.wA ++ [refK];
-                    scene.my.wB = scene.my.wB ++ [_k];
-                    scene.my.nWalk = scene.my.nWalk + 1
-                } : {};
-                scene.my.oRefK = _k;
-                scene.my.oRefY = py
+            scene.my.findCell(kCell, _n);
+            _kIdx = scene.my.found ? scene.my.fi : -1;
+            _kIdx != -1 ? {
+                scene.my.kHeatCell = kCell;
+                scene.my.kHeatIdx = _kIdx
             } : {}
         };
-        scene.my.oLastK = _k;
-        scene.my.oLastGX = px
+        _kIdx == -1 ? {
+            scene.my.curCellHeat = 0.0
+        } : {
+            scene.my.curCellHeat = scene.my.cHeat(_kIdx);
+            isGnd == 1 ? {
+                _addAmt := 0.0;
+                kCell != scene.my.prevHeatCell ? {
+                    _addAmt = 6.0;
+                    scene.my.prevHeatCell = kCell;
+                    scene.my.heatDwell = 0
+                } : {
+                    scene.my.heatDwell = scene.my.heatDwell + 1;
+                    scene.my.heatDwell >= 10 ? {
+                        _addAmt = 3.0;
+                        scene.my.heatDwell = 0
+                    } : {}
+                };
+                _addAmt > 0.0 ? {
+                    _nh := scene.my.curCellHeat + _addAmt;
+                    _nh = (_nh > 200.0) ? 200.0 : _nh;
+                    scene.my.setAt(scene.my.cHeat, _n, _kIdx, _nh);
+                    scene.my.cHeat = scene.my.oList;
+                    scene.my.curCellHeat = _nh
+                } : {}
+            } : {}
+        };
+        scene.my.tk % 4 == 0 ? {
+            scene.my.heatCursor >= _n ? { scene.my.heatCursor = 0 } : {};
+            _dh := scene.my.cHeat(scene.my.heatCursor);
+            _dh > 0.0 ? {
+                _ndh := (_dh > 0.08) ? (_dh - 0.08) : 0.0;
+                scene.my.setAt(scene.my.cHeat, _n, scene.my.heatCursor, _ndh);
+                scene.my.cHeat = scene.my.oList;
+                scene.my.heatCursor == _kIdx ? { scene.my.curCellHeat = _ndh } : {}
+            } : {};
+            scene.my.heatCursor = (scene.my.heatCursor + 1) % _n
+        } : {}
     }
 };
 
-scene.my.plState = 0; scene.my.plHold = 0; scene.my.plPass = 0; scene.my.plE = 0;
-scene.my.plAdded = false; scene.my.plFound = false;
-scene.my.pvK = []; scene.my.pvT = []; scene.my.pvA = []; scene.my.nPv = 0;
-scene.my.planType = -1; scene.my.planA = 0; scene.my.kRow = 0; scene.my.gRow = 0;
-scene.my.plBestD = 99; scene.my.plBestT = 2; scene.my.plBestA = 0; scene.my.plLastK = -1;
-
-scene.my.findPv = (k, i)=>{
-    i < 0 ? {} : {
-        scene.my.pvK(i) == k ? { scene.my.found = true; scene.my.fi = i } : { scene.my.findPv(k, i - 1) }
-    }
+scene.my.coolChunk = (lst, lo, cnt, dec)=>{
+    for(cnt, (j)=>{
+        _i := lo + j;
+        _v := lst(_i) - dec;
+        _nv := (_v > 0) ? _v : 0;
+        _nv > 0 ? { scene.my.oCount = scene.my.oCount + 1 } : {};
+        scene.my.oList = scene.my.oList ++ [_nv]
+    })
+};
+scene.my.coolList = (lst, n, dec)=>{
+    scene.my.oList = [];
+    _rem := n % 20;
+    _nc := (n - _rem) / 20;
+    _nc > 0 ? {
+        for(_nc, (c)=>{
+            scene.my.coolChunk(lst, c * 20, 20, dec)
+        })
+    } : {};
+    _rem > 0 ? {
+        scene.my.coolChunk(lst, _nc * 20, _rem, dec)
+    } : {}
 };
 
-scene.my.addPv = (k, t, a)=>{
-    scene.my.nPv < 40 ? {
-        scene.my.nPv == 0 ? { scene.my.plBestD = 99; scene.my.plBestT = 2; scene.my.plBestA = 0 } : {};
-        scene.my.pvK = scene.my.pvK ++ [k];
-        scene.my.pvT = scene.my.pvT ++ [t];
-        scene.my.pvA = scene.my.pvA ++ [a];
-        scene.my.nPv = scene.my.nPv + 1;
-        scene.my.plAdded = true;
-        _rd := k % 1000 - scene.my.gRow;
-        _ad := (_rd < 0) ? -_rd : _rd;
-        _ad < scene.my.plBestD ? {
-            scene.my.plBestD = _ad;
-            scene.my.plBestT = t;
-            scene.my.plBestA = a
+scene.my.coolStep = (u)=>{
+    (scene.my.coolCount > 0 && scene.my.tk % 15 == 0) ? {
+        _prevCool := scene.my.coolCount;
+        scene.my.oCount = 0;
+        scene.my.nWalk > 0 ? {
+            scene.my.coolList(scene.my.wCool, scene.my.nWalk, 15);
+            scene.my.wCool = scene.my.oList
         } : {};
-        (k % 1000 == scene.my.gRow) ? {
-            scene.my.plFound = true;
-            scene.my.planType = t;
-            scene.my.planA = a;
-            scene.my.plState = 2
+        scene.my.nFall > 0 ? {
+            scene.my.coolList(scene.my.fCool, scene.my.nFall, 15);
+            scene.my.fCool = scene.my.oList
+        } : {};
+        scene.my.coolCount = scene.my.oCount;
+        scene.my.coolCount < _prevCool ? {
+            scene.my.bfDirty = true;
+            scene.my.bfResweep = true
         } : {}
     } : {}
 };
 
-scene.my.plEdge = (s, d, et, ex)=>{
-    _et := (et == 1 && d % 1000 > s % 1000) ? 4 : et;
-    scene.my.found = false;
-    scene.my.findPv(d, scene.my.nPv - 1);
-    scene.my.found ? {} : {
-        scene.my.found = false;
-        scene.my.findPv(s, scene.my.nPv - 1);
-        scene.my.found ? {
-            _sh := scene.my.pvT(scene.my.fi);
-            _sa := scene.my.pvA(scene.my.fi);
-            _sh == 2 ? {
-                scene.my.addPv(d, _et, (_et == 0) ? d : ex)
-            } : {
-                scene.my.addPv(d, _sh, _sa)
-            }
+scene.my.markBlock = (k, dir)=>{
+    scene.my.findCell(k, scene.my.nCells);
+    scene.my.found ? {
+        _idx := scene.my.fi;
+        dir > 0 ? {
+            scene.my.cBlockR(_idx) == 0 ? {
+                scene.my.setAt(scene.my.cBlockR, scene.my.nCells, _idx, 1);
+                scene.my.cBlockR = scene.my.oList
+            } : {}
         } : {
-            (scene.my.plPass == 0 && s % 1000 == scene.my.kRow) ? {
-                scene.my.addPv(s, 2, 0)
+            scene.my.cBlockL(_idx) == 0 ? {
+                scene.my.setAt(scene.my.cBlockL, scene.my.nCells, _idx, 1);
+                scene.my.cBlockL = scene.my.oList
             } : {}
         }
-    }
+    } : {}
 };
 
-scene.my.plDone = ()=>{
-    scene.my.plState = 2;
-    scene.my.plFound ? {} : {
-        (scene.my.nPv > 0 && scene.my.plBestT != 2) ? {
-            scene.my.planType = scene.my.plBestT;
-            scene.my.planA = scene.my.plBestA
-        } : {
-            scene.my.planType = -1
-        }
-    }
+scene.my.markRamp = (k)=>{
+    scene.my.findCell(k, scene.my.nCells);
+    scene.my.found ? {
+        _idx := scene.my.fi;
+        scene.my.cRamp(_idx) == 0 ? {
+            scene.my.setAt(scene.my.cRamp, scene.my.nCells, _idx, 1);
+            scene.my.cRamp = scene.my.oList
+        } : {}
+    } : {}
 };
 
-scene.my.planStep0 = (kx, ky, tx, ty)=>{
-    scene.my.plState == 2 ? {
-        scene.my.plHold = scene.my.plHold + 1;
-        scene.my.plHold > 60 ? { scene.my.plState = 0; scene.my.plHold = 0 } : {}
-    } : {
-        scene.my.plState == 0 ? {
-            scene.my.kRow = scene.my.key(kx, ky) % 1000;
-            scene.my.gRow = scene.my.key(tx, ty) % 1000;
-            scene.my.pvK = []; scene.my.pvT = []; scene.my.pvA = [];
-            scene.my.nPv = 0; scene.my.plPass = 0; scene.my.plE = 0;
-            scene.my.plAdded = false; scene.my.plFound = false;
-            scene.my.kRow == scene.my.gRow ? {
-                scene.my.plFound = true;
-                scene.my.planType = 3;
-                scene.my.plState = 2
-            } : {
-                scene.my.plState = 1
-            }
-        } : {
-            _tot := scene.my.nWalk + scene.my.nFall;
-            _tot == 0 ? { scene.my.plDone() } : {
-                (scene.my.plE < scene.my.nWalk) ? {
-                    scene.my.plEdge(scene.my.wA(scene.my.plE), scene.my.wB(scene.my.plE), 0, 0)
-                } : {
-                    _fe := scene.my.plE - scene.my.nWalk;
-                    scene.my.plEdge(scene.my.fA(_fe), scene.my.fB(_fe), 1, scene.my.fX(_fe))
-                };
-                scene.my.plE = scene.my.plE + 1;
-                scene.my.plE >= _tot ? {
-                    scene.my.plE = 0;
-                    scene.my.plPass = scene.my.plPass + 1;
-                    (scene.my.plState == 1 && (!scene.my.plAdded || scene.my.plPass > 12)) ? { scene.my.plDone() } : {};
-                    scene.my.plAdded = false
-                } : {}
-            }
-        }
-    }
-};
-
-scene.my.planStep = (kx, ky, tx, ty)=>{
-    _k := scene.my.key(kx, ky) % 1000;
-    _k != scene.my.plLastK ? {
-        scene.my.plLastK = _k;
-        scene.my.plState = 0;
-        scene.my.plHold = 0
+scene.my.pickUnstickDir = (k, curDir)=>{
+    _gx := (k - k % 1000) / 1000;
+    _gy := k % 1000;
+    _bL := 0;
+    _bR := 0;
+    scene.my.findCell(k, scene.my.nCells);
+    scene.my.found ? {
+        _bL = scene.my.cBlockL(scene.my.fi);
+        _bR = scene.my.cBlockR(scene.my.fi)
     } : {};
-    scene.my.planStep0(kx, ky, tx, ty);
-    scene.my.planStep0(kx, ky, tx, ty);
-    scene.my.planStep0(kx, ky, tx, ty);
-    scene.my.planStep0(kx, ky, tx, ty)
+    _hL := 9999.0;
+    _hR := 9999.0;
+    _bL == 0 ? {
+        scene.my.findCell((_gx - 1) * 1000 + _gy, scene.my.nCells);
+        _hL = scene.my.found ? scene.my.cHeat(scene.my.fi) : -0.5
+    } : {};
+    _bR == 0 ? {
+        scene.my.findCell((_gx + 1) * 1000 + _gy, scene.my.nCells);
+        _hR = scene.my.found ? scene.my.cHeat(scene.my.fi) : -0.5
+    } : {};
+    _ret := -curDir;
+    (_hL + 0.1) < _hR ? {
+        _ret = -1.0
+    } : {
+        (_hR + 0.1) < _hL ? {
+            _ret = 1.0
+        } : {}
+    };
+    _ret
 };
 
-scene.my.sfStep = (px, row)=>{
-    scene.my.nFall == 0 ? {} : {
-        scene.my.sfI >= scene.my.nFall ? {
-            scene.my.sfX = scene.my.sfBestX;
-            scene.my.sfBestX = 99999;
-            scene.my.sfBestD = 99;
-            scene.my.sfI = 0
-        } : {
-            _r := scene.my.fA(scene.my.sfI) % 1000 - row;
-            _dx := scene.my.fX(scene.my.sfI) - px;
-            _adx := (_dx < 0) ? -_dx : _dx;
-            (_r < 2 && _r > -3 && _adx < 8.0 && _adx < scene.my.sfBestD) ? {
-                scene.my.sfBestD = _adx;
-                scene.my.sfBestX = scene.my.fX(scene.my.sfI)
-            } : {};
-            scene.my.sfI = scene.my.sfI + 1
-        }
+scene.my.pickPatrolChunk = (lo, cnt)=>{
+    for(cnt, (j)=>{
+        _i := lo + j;
+        _ck := scene.my.cells(_i);
+        _gy := _ck % 1000;
+        _h := scene.my.cHeat(_i);
+        _sc := (_gy * 2.5) - _h - ((_ck == scene.my.kCell) ? 5.0 : 0.0);
+        _sc > scene.my.patrolScore ? {
+            scene.my.patrolScore = _sc;
+            scene.my.patrolTargetK = _ck
+        } : {}
+    })
+};
+scene.my.pickPatrolTarget = (u)=>{
+    scene.my.patrolScore = -99999.0;
+    scene.my.patrolTargetK = scene.my.kCell;
+    _n := scene.my.nCells;
+    _n > 0 ? {
+        _rem := _n % 20;
+        _nc := (_n - _rem) / 20;
+        _nc > 0 ? {
+            for(_nc, (c)=>{
+                scene.my.pickPatrolChunk(c * 20, 20)
+            })
+        } : {};
+        _rem > 0 ? {
+            scene.my.pickPatrolChunk(_nc * 20, _rem)
+        } : {};
+        _gx := (scene.my.patrolTargetK - scene.my.patrolTargetK % 1000) / 1000 - 500;
+        scene.my.patrolTargetX = (_gx + 0.5) * scene.my.cs
+    } : {
+        scene.my.patrolTargetX = scene.my.seekerPos(0) + scene.my.scanDir * 5.0
     }
 };
+
+scene.my.incUse = (hop)=>{
+    hop >= 0 ? {
+        hop < 1000 ? {
+            hop < scene.my.nWalk ? {
+                _nu := scene.my.wUse(hop) + 1;
+                _nu = (_nu > 10) ? 10 : _nu;
+                scene.my.setAt(scene.my.wUse, scene.my.nWalk, hop, _nu);
+                scene.my.wUse = scene.my.oList;
+                scene.my.bfDirty = true;
+                scene.my.bfResweep = true
+            } : {}
+        } : {
+            _fi := hop - 1000;
+            _fi < scene.my.nFall ? {
+                _nu := scene.my.fUse(_fi) + 1;
+                _nu = (_nu > 10) ? 10 : _nu;
+                scene.my.setAt(scene.my.fUse, scene.my.nFall, _fi, _nu);
+                scene.my.fUse = scene.my.oList;
+                scene.my.bfDirty = true;
+                scene.my.bfResweep = true
+            } : {}
+        }
+    } : {}
+};
+
+scene.my.getUse = (hop)=>{
+    _res := 0;
+    (hop >= 0 && hop < 1000) ? {
+        hop < scene.my.nWalk ? {
+            _res = scene.my.wUse(hop)
+        } : {}
+    } : {
+        hop >= 1000 ? {
+            _fi := hop - 1000;
+            (_fi >= 0 && _fi < scene.my.nFall) ? {
+                _res = scene.my.fUse(_fi)
+            } : {}
+        } : {}
+    };
+    _res
+};
+
+scene.my.hopCool = (hop)=>{
+    _res := 999;
+    (hop >= 0 && hop < 1000) ? {
+        hop < scene.my.nWalk ? {
+            _res = scene.my.wCool(hop)
+        } : {}
+    } : {
+        hop >= 1000 ? {
+            _fi := hop - 1000;
+            (_fi >= 0 && _fi < scene.my.nFall) ? {
+                _res = scene.my.fCool(_fi)
+            } : {}
+        } : {}
+    };
+    _res
+};
+
+scene.my.incFail = (hop)=>{
+    hop >= 0 ? {
+        hop < 1000 ? {
+            hop < scene.my.nWalk ? {
+                _nf := scene.my.wFail(hop) + 1;
+                _nf = (_nf > 10) ? 10 : _nf;
+                scene.my.setAt(scene.my.wFail, scene.my.nWalk, hop, _nf);
+                scene.my.wFail = scene.my.oList;
+                scene.my.setAt(scene.my.wCool, scene.my.nWalk, hop, 600);
+                scene.my.wCool = scene.my.oList;
+                scene.my.coolCount = scene.my.coolCount + 1;
+                scene.my.bfDirty = true;
+                scene.my.bfResweep = true
+            } : {}
+        } : {
+            _fi := hop - 1000;
+            _fi < scene.my.nFall ? {
+                _nf := scene.my.fFail(_fi) + 1;
+                _nf = (_nf > 10) ? 10 : _nf;
+                scene.my.setAt(scene.my.fFail, scene.my.nFall, _fi, _nf);
+                scene.my.fFail = scene.my.oList;
+                scene.my.setAt(scene.my.fCool, scene.my.nFall, _fi, 600);
+                scene.my.fCool = scene.my.oList;
+                scene.my.coolCount = scene.my.coolCount + 1;
+                scene.my.bfDirty = true;
+                scene.my.bfResweep = true
+            } : {}
+        }
+    } : {}
+};
+
+scene.my.hasWChunk = (a, b, lo, cnt)=>{
+    for(cnt, (j)=>{
+        _i := lo + j;
+        (scene.my.wA(_i) == a && scene.my.wB(_i) == b) ? { scene.my.found = true; scene.my.fi = _i } : {}
+    })
+};
+scene.my.hasW = (a, b, i)=>{
+    scene.my.found = false;
+    _n := i + 1;
+    _n > 0 ? {
+        _rem := _n % 20;
+        _nc := (_n - _rem) / 20;
+        _nc > 0 ? {
+            for(_nc, (c)=>{
+                !scene.my.found ? { scene.my.hasWChunk(a, b, c * 20, 20) } : {}
+            })
+        } : {};
+        (!scene.my.found && _rem > 0) ? {
+            scene.my.hasWChunk(a, b, _nc * 20, _rem)
+        } : {}
+    } : {}
+};
+
+scene.my.hasFChunk = (a, x, vx, lo, cnt)=>{
+    for(cnt, (j)=>{
+        _i := lo + j;
+        _dx := scene.my.fX(_i) - x;
+        _dvx := scene.my.fVx(_i) - vx;
+        (scene.my.fA(_i) == a && _dx < 0.5 && _dx > -0.5 && _dvx < 1.0 && _dvx > -1.0) ? { scene.my.found = true; scene.my.fi = _i } : {}
+    })
+};
+scene.my.hasF = (a, x, vx, i)=>{
+    scene.my.found = false;
+    _n := i + 1;
+    _n > 0 ? {
+        _rem := _n % 20;
+        _nc := (_n - _rem) / 20;
+        _nc > 0 ? {
+            for(_nc, (c)=>{
+                !scene.my.found ? { scene.my.hasFChunk(a, x, vx, c * 20, 20) } : {}
+            })
+        } : {};
+        (!scene.my.found && _rem > 0) ? {
+            scene.my.hasFChunk(a, x, vx, _nc * 20, _rem)
+        } : {}
+    } : {}
+};
+
+scene.my.ensureCell = (k)=>{
+    scene.my.findCell(k, scene.my.nCells);
+    (!scene.my.found && scene.my.nCells < scene.my.maxCells) ? {
+        scene.my.cells = scene.my.cells ++ [k];
+        scene.my.cBlockL = scene.my.cBlockL ++ [0];
+        scene.my.cBlockR = scene.my.cBlockR ++ [0];
+        scene.my.cRamp = scene.my.cRamp ++ [0];
+        scene.my.cHeat = scene.my.cHeat ++ [0.0];
+        scene.my.nCells = scene.my.nCells + 1;
+        scene.my.bfDirty = true;
+        scene.my.bfResweep = true
+    } : {}
+};
+
+scene.my.recTick = (px, py, vx, vy, pvy, air, gnd, peakAir, lastK, lastGX, lastGVx, refK, isK, slopeHit)=>{
+    _fall := ((vy - pvy) < -0.1) && (slopeHit == 0);
+    scene.my.oAir = _fall ? (air + 1) : 0;
+    scene.my.oGnd = _fall ? 0 : (gnd + 1);
+    scene.my.oPeakAir = _fall ? ((scene.my.oAir > peakAir) ? scene.my.oAir : peakAir) : peakAir;
+    scene.my.oLastK = lastK;
+    scene.my.oLastGX = lastGX;
+    scene.my.oLastGVx = lastGVx;
+    scene.my.oRefK = refK;
+    _minGnd := (isK == 0) ? 1 : 3;
+    (_fall || scene.my.oGnd < _minGnd) ? {} : {
+        _k := scene.my.key(px, py);
+        scene.my.ensureCell(_k);
+        (isK == 1 && slopeHit == 1) ? {
+            _anx := (scene.my.kGroundNx < 0) ? -scene.my.kGroundNx : scene.my.kGroundNx;
+            _anx > 0.20 ? { scene.my.markRamp(_k) } : {}
+        } : {};
+        refK == -1 ? { scene.my.oRefK = _k } : {};
+        peakAir >= 3 ? {
+            (lastK != -1 && _k != lastK) ? {
+                scene.my.found = false;
+                scene.my.hasF(lastK, lastGX, lastGVx, scene.my.nFall - 1);
+                (!scene.my.found && scene.my.nFall < scene.my.maxFall) ? {
+                    scene.my.fA = scene.my.fA ++ [lastK];
+                    scene.my.fB = scene.my.fB ++ [_k];
+                    scene.my.fX = scene.my.fX ++ [lastGX];
+                    scene.my.fVx = scene.my.fVx ++ [lastGVx];
+                    scene.my.fByK = scene.my.fByK ++ [isK];
+                    scene.my.fFail = scene.my.fFail ++ [0];
+                    scene.my.fCool = scene.my.fCool ++ [0];
+                    scene.my.fUse = scene.my.fUse ++ [isK];
+                    scene.my.nFall = scene.my.nFall + 1;
+                    scene.my.bfDirty = true;
+                    scene.my.bfResweep = true
+                } : {
+                    (scene.my.found && isK == 1) ? {
+                        _hid := 1000 + scene.my.fi;
+                        scene.my.fByK(scene.my.fi) == 0 ? {
+                            scene.my.setAt(scene.my.fByK, scene.my.nFall, scene.my.fi, 1);
+                            scene.my.fByK = scene.my.oList
+                        } : {};
+                        _hid != scene.my.lastUsedHop ? {
+                            scene.my.incUse(_hid)
+                        } : {
+                            scene.my.lastUsedHop = -1
+                        }
+                    } : {}
+                }
+            } : {};
+            scene.my.oPeakAir = 0;
+            scene.my.oRefK = _k
+        } : {
+            (refK != -1 && _k != refK) ? {
+                scene.my.found = false;
+                scene.my.hasW(refK, _k, scene.my.nWalk - 1);
+                (!scene.my.found && scene.my.nWalk < scene.my.maxWalk) ? {
+                    scene.my.wA = scene.my.wA ++ [refK];
+                    scene.my.wB = scene.my.wB ++ [_k];
+                    scene.my.wByK = scene.my.wByK ++ [isK];
+                    scene.my.wFail = scene.my.wFail ++ [0];
+                    scene.my.wCool = scene.my.wCool ++ [0];
+                    scene.my.wUse = scene.my.wUse ++ [isK];
+                    scene.my.nWalk = scene.my.nWalk + 1;
+                    scene.my.bfDirty = true;
+                    scene.my.bfResweep = true
+                } : {
+                    (scene.my.found && isK == 1) ? {
+                        _hid := scene.my.fi;
+                        scene.my.wByK(scene.my.fi) == 0 ? {
+                            scene.my.setAt(scene.my.wByK, scene.my.nWalk, scene.my.fi, 1);
+                            scene.my.wByK = scene.my.oList
+                        } : {};
+                        _hid != scene.my.lastUsedHop ? {
+                            scene.my.incUse(_hid)
+                        } : {
+                            scene.my.lastUsedHop = -1
+                        }
+                    } : {}
+                };
+                scene.my.oRefK = _k
+            } : {}
+        };
+        scene.my.oLastK = _k;
+        scene.my.oLastGX = px;
+        scene.my.oLastGVx = vx
+    }
+};
+
+scene.my.isVCell4 = (k, i)=>{
+    i < 0 ? {} : {
+        scene.my.vCells(i) == k ? { scene.my.found = true } : { scene.my.isVCell4(k, i - 1) }
+    }
+};
+
+scene.my.addVCell = (k)=>{
+    (k != -1 && scene.my.nVCells < 20) ? {
+        scene.my.found = false;
+        scene.my.nVCells > 0 ? {
+            scene.my.isVCell4(k, scene.my.nVCells - 1)
+        } : {};
+        !scene.my.found ? {
+            scene.my.vCells = scene.my.vCells ++ [k];
+            scene.my.nVCells = scene.my.nVCells + 1
+        } : {}
+    } : {}
+};
+
+scene.my.bfSeedChunk = (lo, cnt)=>{
+    for(cnt, (j)=>{
+        _i := lo + j;
+        _ck := scene.my.cells(_i);
+        scene.my.found = false;
+        scene.my.nVCells > 0 ? {
+            scene.my.isVCell4(_ck, scene.my.nVCells - 1)
+        } : {
+            (scene.my.targetCell != -1 && _ck == scene.my.targetCell) ? { scene.my.found = true } : {}
+        };
+        scene.my.bfCost = scene.my.bfCost ++ [scene.my.found ? 0.0 : 99999];
+        scene.my.bfHop = scene.my.bfHop ++ [-1]
+    })
+};
+
+scene.my.bfInit = (u)=>{
+    scene.my.bfCost = [];
+    scene.my.bfHop = [];
+    scene.my.bfN = scene.my.nCells;
+    scene.my.bfCursor = 0;
+    scene.my.bfPass = 0;
+    scene.my.bfChanged = false;
+    scene.my.bfNeedsInit = false;
+    scene.my.bfResweep = false;
+    _n := scene.my.bfN;
+    _rem := _n % 20;
+    _nc := (_n - _rem) / 20;
+    _nc > 0 ? {
+        for(_nc, (c)=>{
+            scene.my.bfSeedChunk(c * 20, 20)
+        })
+    } : {};
+    _rem > 0 ? {
+        scene.my.bfSeedChunk(_nc * 20, _rem)
+    } : {}
+};
+
+scene.my.bfRelax = (ei)=>{
+    _isWalk := (ei >= 0 && ei < scene.my.nWalk);
+    _fi := ei - scene.my.nWalk;
+    _cool := 999;
+    _u := 0;
+    _v := 0;
+    _byK := 1;
+    _fail := 0;
+    _use := 0;
+    _isWalk ? {
+        _cool = scene.my.wCool(ei);
+        _u = scene.my.wA(ei);
+        _v = scene.my.wB(ei);
+        _byK = scene.my.wByK(ei);
+        _fail = scene.my.wFail(ei);
+        _use = scene.my.wUse(ei)
+    } : {
+        (_fi >= 0 && _fi < scene.my.nFall) ? {
+            _cool = scene.my.fCool(_fi);
+            _u = scene.my.fA(_fi);
+            _v = scene.my.fB(_fi);
+            _byK = scene.my.fByK(_fi);
+            _fail = scene.my.fFail(_fi);
+            _use = scene.my.fUse(_fi)
+        } : {}
+    };
+    _cool > 0 ? {} : {
+        _base := _isWalk ? 1.0 : ((_v % 1000 > _u % 1000) ? 2.0 : 1.2);
+        _hop := _isWalk ? ei : (1000 + _fi);
+        scene.my.findCell(_v, scene.my.bfN);
+        _vFound := scene.my.found;
+        _vIdx := scene.my.fi;
+        scene.my.findCell(_u, scene.my.bfN);
+        _uFound := scene.my.found;
+        _uIdx := scene.my.fi;
+        (_vFound && _uFound) ? {
+            _heatPen := scene.my.cHeat(_vIdx) * 0.85;
+            _usePen := _use * 14.0;
+            _w := _base * ((_byK == 1) ? 1.0 : 1.25) * (1.0 + _fail * 1.5) + _heatPen + _usePen;
+            _cand := scene.my.bfCost(_vIdx) + _w;
+            _cand < scene.my.bfCost(_uIdx) ? {
+                scene.my.setAt(scene.my.bfCost, scene.my.bfN, _uIdx, _cand);
+                scene.my.bfCost = scene.my.oList;
+                scene.my.setAt(scene.my.bfHop, scene.my.bfN, _uIdx, _hop);
+                scene.my.bfHop = scene.my.oList;
+                scene.my.bfChanged = true
+            } : {}
+        } : {}
+    }
+};
+
+scene.my.bfStep = (u)=>{
+    scene.my.bfDirty ? {
+        _tot := scene.my.nWalk + scene.my.nFall;
+        ((scene.my.bfNeedsInit || scene.my.bfN == 0) && scene.my.nCells > 0) ? {
+            scene.my.bfInit(0)
+        } : {};
+        _tot == 0 ? {
+            scene.my.bfN > 0 ? {
+                scene.my.cCost = scene.my.bfCost;
+                scene.my.cHop = scene.my.bfHop;
+                scene.my.nCReady = scene.my.bfN;
+                scene.my.bfGen = scene.my.bfGen + 1;
+                scene.my.bfNeedsInit = true;
+                scene.my.bfDirty = scene.my.bfResweep
+            } : {}
+        } : {
+            _rem := _tot - scene.my.bfCursor;
+            _steps := (_rem > 12) ? 12 : ((_rem > 0) ? _rem : 0);
+            _s0 := (_steps > 6) ? 6 : _steps;
+            _s1 := _steps - _s0;
+            _s0 > 0 ? {
+                for(_s0, (s)=>{
+                    scene.my.bfRelax(scene.my.bfCursor);
+                    scene.my.bfCursor = scene.my.bfCursor + 1
+                })
+            } : {};
+            _s1 > 0 ? {
+                for(_s1, (s)=>{
+                    scene.my.bfRelax(scene.my.bfCursor);
+                    scene.my.bfCursor = scene.my.bfCursor + 1
+                })
+            } : {};
+            scene.my.bfCursor >= _tot ? {
+                scene.my.bfCursor = 0;
+                scene.my.bfPass = scene.my.bfPass + 1;
+                (!scene.my.bfChanged || scene.my.bfPass >= 8) ? {
+                    scene.my.cCost = scene.my.bfCost;
+                    scene.my.cHop = scene.my.bfHop;
+                    scene.my.nCReady = scene.my.bfN;
+                    scene.my.bfGen = scene.my.bfGen + 1;
+                    scene.my.bfNeedsInit = true;
+                    scene.my.bfDirty = scene.my.bfResweep
+                } : {
+                    scene.my.bfChanged = false
+                }
+            } : {}
+        }
+    } : {}
+};
+
+scene.my.v09Setup = true
